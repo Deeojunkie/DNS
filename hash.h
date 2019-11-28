@@ -1,33 +1,28 @@
-//
-// Created by wangzhi on 17-3-28.
-//
-//
-
 #ifndef DNS_HASH_H
 #define DNS_HASH_H
 
 
-typedef struct HashNode{  // [key，value]是一对键值对
-	const void * key;
-	void * value;
-	struct HashNode * next;
+typedef struct HashNode{
+    const void * key;
+    void * value;
+    struct HashNode * next;
 }HashNode;
 
 typedef struct{
-	HashNode ** bucket;
-	unsigned int size;
-	int length;
-
-	/* 用来实现HashTable_map必须强制实施的一项已检查的运行时错误：map函数遍历表项是不能改变表的
-	 * 可以改变表项中的值，但是不能插入或删除表项
-	 * timestamp在insert和remove时加一
-	 * map函数在遍历后使用assert检查前后是否一致。
-	 */
-	unsigned int timestamp;
-
-	int (*cmp)(const void *x, const void * y);
-	unsigned int (*hash)(const void *key);
-	void (*freeKey)(const void *key);
+    HashNode ** bucket;
+    unsigned int size;
+    int length;
+    
+    /* 用来实现HashTable_map必须强制实施的一项已检查的运行时错误：map函数遍历表项是不能改变表的
+     * 可以改变表项中的值，但是不能插入或删除表项
+     * timestamp在insert和remove时加一
+     * map函数在遍历后使用assert检查前后是否一致。
+     */
+    unsigned int timestamp;
+    
+    int (*cmp)(const void *x, const void * y);
+    unsigned int (*hash)(const void *key);
+    void (*freeKey)(const void *key);
 } *HashTable;
 
 HashTable HashTable_create(int hint, int (*cmp)(const void *x, const void * y),unsigned int (*hash)(const void *key),void (*freeKey)(const void *key));

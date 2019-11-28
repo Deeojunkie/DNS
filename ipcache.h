@@ -1,7 +1,3 @@
-//
-// Created by wangzhi on 17-5-2.
-//http://blog.csdn.net/djinglan/article/details/8812934 字符串的经典哈希函数
-
 #include <stdint.h>
 #include "hash.h"
 #include "set.h"
@@ -11,6 +7,7 @@
 
 typedef HashTable IpCache;
 
+//初始化
 IpCache IpCache_init();
 
 //从文件中读取ip和域名的映射

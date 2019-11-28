@@ -1,6 +1,3 @@
-//
-// Created by wangzhi on 17-5-2.
-//
 #include <stdio.h>
 #include <string.h>
 #include <sys/malloc.h>
@@ -9,6 +6,8 @@
 #include <arpa/inet.h>
 #include <errno.h>
 
+/* 字符串哈希函数实质上是把每个不同的字符串映射成不同的整数
+   哈希函数需要保证唯一性，避免冲突 */
 unsigned int SDBMHash(const void *key)
 {
 	register unsigned int hash = 0;
@@ -21,12 +20,14 @@ unsigned int SDBMHash(const void *key)
 	}
 	return hash;
 }
-unsigned int ipHash(const void *key)
+
+unsigned int ipHash(const void *key)    //IP地址的哈希函数
 {
 	return (unsigned int) *(uint32_t *)key;
 }
 
-int cmpHost(const void *x, const void *y){
+
+int cmpHost(const void *x, const void *y){    //x=y返回0，否则返回非0
 	return strcmp(x,y);
 }
 
@@ -63,30 +64,30 @@ void IpCache_read(IpCache ipCache, char filename[])
 	fscanf(readfile, " %s", hostbuff);
 	while (!feof(readfile))
 	{
-		host = strdup(hostbuff);
+		host = strdup(hostbuff);   //字符串拷贝
 		ip = (uint32_t *)malloc(sizeof(uint32_t));
 		if (ip == NULL)
 		{
 			fprintf(stderr,"malloc error %s",strerror(errno));
 			exit(-1);
 		}
-		if(inet_pton(AF_INET,ipbuff,ip) < 0)
+		if(inet_pton(AF_INET,ipbuff,ip) < 0)   //将ipbuff中的点分十进制串转换成网络字节序二进制值ip
 		{
 			fprintf(stderr,"convert: %s",strerror(errno));
 			exit(-1);
 		}
 
 		HashSet tmpSet = HashTable_get(ipCache,host);
-		if (tmpSet == NULL)
+		if (tmpSet == NULL)      //该域名还没有对应的ip地址，创建一个新的hashset
 		{
 			tmpSet = HashSet_create(100,cmpIp,ipHash);
 			HashSet_insert(tmpSet,ip);
-			HashTable_insert(ipCache,host,tmpSet);
+			HashTable_insert(ipCache,host,tmpSet);   //表，键，值
 		}
-		else
+		else   //该域名已经有对应的hashset
 		{
 			free(host);
-			HashSet_insert(tmpSet,ip);
+			HashSet_insert(tmpSet,ip);   //将ip插入到host对应的hashset中
 		}
 		fscanf(readfile, " %s", ipbuff);
 		fscanf(readfile, " %s", hostbuff);
@@ -97,7 +98,7 @@ void IpCache_read(IpCache ipCache, char filename[])
 uint32_t **IpCache_search(IpCache ipCache, char *host)
 {
 	uint32_t **ipArray;
-	HashSet tmpSet = HashTable_get(ipCache,host);
+	HashSet tmpSet = HashTable_get(ipCache,host);   //得到该host对应的hashset
 	if(tmpSet == NULL)
 	{
 		return NULL;

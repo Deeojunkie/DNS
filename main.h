@@ -1,7 +1,3 @@
-//
-// Created by wangzhi on 17-5-9.
-//
-
 #include <stdbool.h>
 
 #ifndef DNS_MAIN_H_H

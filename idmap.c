@@ -1,7 +1,3 @@
-//
-// Created by wangzhi on 17-5-10.
-//
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -17,9 +13,9 @@ static void freeKey(const void *key){
 
 }
 
-unsigned int idHash(const void *key)
+unsigned int idHash(const void *key)   //id的哈希函数
 {
-	return (unsigned int) *(uint32_t *)key;
+	return (unsigned int) *(uint16_t *)key;
 }
 
 IdMap IdMap_init()
@@ -55,11 +51,11 @@ void IdMap_insert(IdMap idMap, uint16_t id, struct sockaddr_in clientAddr, uint1
 		fprintf(stderr,"malloc error %s",strerror(errno));
 		exit(-1);
 	}
-	ipId_ptr->id = idOld;
-	ipId_ptr->clientAddr = clientAddr;
-	ipId_ptr->requireTime = time(NULL);
+	ipId_ptr->id = idOld;   //客户端发过来的旧id
+	ipId_ptr->clientAddr = clientAddr;   //客户端的ip地址和端口
+	ipId_ptr->requireTime = time(NULL);    //id映射的时间
 
-	HashTable_insert(idMap, id_ptr, ipId_ptr);
+	HashTable_insert(idMap, id_ptr, ipId_ptr);   // key：新id    value：Ipid结构体『旧id、客户端地址、时间戳』
 }
 
 typedef struct{
@@ -73,19 +69,19 @@ void apply(const void *key, void **value, void *c1)
 	uint16_t **idArray = ((IdArray *)c1)->idArray;
 	IpId *ipId = *value;
 	assert(ipId);
-	if (timeNow - ipId->requireTime > AGE)
+	if (timeNow - ipId->requireTime > AGE)   //删除超过30秒
 	{
 	    idArray[((IdArray *)c1)->length++] = key;
 	}
 }
 
-void IdMap_update(IdMap idMap)
+void IdMap_update(IdMap idMap)    //刷新IdMap，删除超时映射
 {
 	IdArray * idArray = malloc(sizeof(IdArray));
 	idArray->length = 0;
 	idArray->idArray = malloc(sizeof(uint16_t *)*HashTable_length(idMap));
 
-	HashTable_map(idMap,apply,idArray);
+	HashTable_map(idMap,apply,idArray);   //idArray->idArray： 超时的id的指针数组
 
 	for (int i = 0; i < idArray->length; ++i)
 	{

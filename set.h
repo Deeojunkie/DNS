@@ -1,9 +1,3 @@
-//
-// Created by wangzhi on 17-4-29.
-// 使用哈希表实现集合,简化的集合，只有插入和读取两种操作
-// 主要为ip地址服务，由于一个域名可能对应多个ip地址，所以使用一个集合来作为多ip地址的存储结构
-//
-
 #ifndef DNS_SET_H
 #define DNS_SET_H
 
